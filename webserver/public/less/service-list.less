@@ -3,7 +3,10 @@
 .success {color:green;}
 .warning, .warnings{color:orange;}
 
+.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:0px}
 .table-services {
+  padding: 0px;
+  font-family: "Trebuchet MS", "Helvetica", "sans-serif";
 
   tr.result-success .result-uptime a {
     color:green;
@@ -18,7 +21,7 @@
   }
 
   .result-uptime {
-    font-size: 1.3em;
+    font-size: 100%;
   }
 
   th {
@@ -26,7 +29,7 @@
   }
 
   td {
-    font-size:120%;
+    font-size:100%;
   }
 
   td.outages {
@@ -41,7 +44,7 @@
     text-transform: uppercase;
     margin-top: 20px;
     opacity: 0.6;
-    font-size:100%;
+    font-size: 100%;
     color: gray;
   }
 
@@ -58,7 +61,7 @@
       text-align: center;
 
       .btn {
-        font-size: 11pt;
+        font-size: 9pt;
         margin:0 5px;
       }
     }
@@ -69,7 +72,7 @@
   margin: 10px 0;
 
   input.query {
-    padding-left:30px;
+    padding-left:20px;
     display:block;
   }
 
@@ -81,6 +84,9 @@
   }
 
   div.filter-to-me {
+    padding-top: 5px;
+  }
+  div.filters {
     padding-top: 5px;
   }
 }

@@ -8,29 +8,41 @@
 <div class="container-fluid" ng-show="!loading">
     <div class="row">
         <div class="filter-container">
-            <% if (user){ %>
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-8">
                     <span class="icon glyphicon glyphicon-search"></span>
                     <input ng-model="query" class="query form-control" placeholder="filter by host name"/>
                 </div>
-                <div class="col-md-2 filter-to-me">
-                    <input ng-model="filterRestrictedToMe" id="filterRestrictedToMe" type="checkbox"/>
-                    <label for="filterRestrictedToMe">only restricted to me</label>
+                <div class="col-md-4 filters">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input ng-model="filterRestrictedToMe" id="filterRestrictedToMe" type="checkbox" checked/>
+                            <label for="filterRestrictedToMe">PROD</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input ng-model="filterRestrictedStage01" id="filterRestrictedStage01" type="checkbox"/>
+                            <label for="filterRestrictedStage01">STAGE01</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input ng-model="filterRestrictedStage02" id="filterRestrictedStage02" type="checkbox"/>
+                            <label for="filterRestrictedStage02">STAGE02</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input ng-model="filterRestrictedStage03" id="filterRestrictedStage03" type="checkbox"/>
+                            <label for="filterRestrictedStage03">STAGE03</label>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <% } else {%>
-            <input ng-model="query" class="query form-control" placeholder="filter by host name"/>
-            <% } %>
         </div>
 
         <table ng-table="tableParams" class="table-services table sorted table-striped table-condensed">
             <tbody>
 
             <tr ng-class={'result-disabled':row.service.enabled===false,'result-success':!row.status.currentOutage,'result-error':row.status.currentOutage}
-                ng-repeat="row in $data | filter:serviceFilter">
+                ng-repeat="row in $data | filter:serviceFilter ">
 
-                <% if ((user && user.isAdmin) || no_auth) { %>
+                <% if (user && user.isAdmin) { %>
                 <td class="admin-operations" data-title="'Admin'">
                     <div class="btn-group">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -53,8 +65,9 @@
                 <% } %>
 
                 <td class="status" data-title="'Status'" sortable="'status.currentOutage'">
-                    <span ng-if="row.status.currentOutage" class="label label-danger">offline</span>
-                    <span ng-if="!row.status.currentOutage" class="label label-success">online</span>
+                    <span ng-if="(!row.service.isPaused && row.status.currentOutage)" class="label label-danger">offline</span>
+                    <span ng-if="(!row.service.isPaused && !row.status.currentOutage)" class="label label-success">online</span>
+                    <span ng-if="row.service.isPaused" class="label label-info">Paused</span>
                 </td>
 
                 <td class="result-uptime"  data-title="'last 24h'" sortable="'status.last24Hours.uptime'">
@@ -71,11 +84,11 @@
                 </td>
 
                 <td header-class="'hidden-sm hidden-xs'" class="service hidden-sm hidden-xs"
-                    data-title="'Service'" sortable="'name'">
-                    {{row.service.pingServiceName}}
+                    data-title="'Env:MethodType'" sortable="'name'">
+                    {{row.service.restrictedToEnv}}:{{row.service.serviceType}}
                 </td>
 
-                <td data-title="'Host'" sortable="'service.name'">
+                <td data-title="'Service'" sortable="'service.name'">
                     <span ng-if="row.service.isRestricted" class="glyphicon glyphicon-lock" aria-hidden="true"></span>
                     <a class="name" href="/services/{{row.service.id}}/view">
                         {{row.service.name}}
@@ -88,6 +101,26 @@
                         <span ms-time="row.status.last24Hours.downtime"></span>
                     </span>
                 </td>
+
+                <td header-class="'hidden-sm hidden-xs'" class="outages hidden-sm hidden-xs" data-title="'Outages last 24h'" sortable="'status.last24Hours.numberOutages'">
+                    <span class="label label-danger" ng-if="row.status.last24Hours.numberOutages">
+                        {{row.status.last24Hours.numberOutages}}
+                    </span>
+                </td>
+
+                <% if (user) { %>
+                <td>
+                    <a class="edit btn btn-default btn-xs" href="services/{{row.service.id}}/edit">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                    </a>
+                    <button class="btn btn-warning btn-xs" ng-click="pause(row.service.id)" ng-if="!row.service.isPaused" >
+                        <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
+                    </button>
+                    <button class="btn btn-warning btn-xs" ng-click="resume(row.service.id)" ng-if="row.service.isPaused" >
+                        <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume
+                    </button>
+                </td>
+                <% } %>
             </tr>
             </tbody>
         </table>
